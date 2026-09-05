@@ -1,0 +1,150 @@
+name: Automated Multi-Platform Desktop & Web Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version_override:
+        description: 'Custom version tag (e.g. v1.0.1). Leave empty for auto-increment.'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  prepare_release:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.set_version.outputs.VERSION }}
+      tag_name: ${{ steps.set_version.outputs.TAG_NAME }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Next Semantic Version
+        id: set_version
+        run: |
+          if [ -n "${{ github.event.inputs.version_override }}" ]; then
+            TAG="${{ github.event.inputs.version_override }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            # Auto-versioning based on base package version + run number
+            MAJOR_MINOR=$(node -p "require('./package.json').version.split('.').slice(0,2).join('.')")
+            TAG="v${MAJOR_MINOR}.${{ github.run_number }}"
+          fi
+          
+          # Clean version without 'v' prefix for electron-builder
+          VER="${TAG#v}"
+          echo "TAG_NAME=${TAG}" >> $GITHUB_OUTPUT
+          echo "VERSION=${VER}" >> $GITHUB_OUTPUT
+          echo "Calculated Release Tag: ${TAG} (Version: ${VER})"
+
+      - name: Create Git Tag if not present
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git rev-parse "${{ steps.set_version.outputs.TAG_NAME }}" >/dev/null 2>&1; then
+            git tag "${{ steps.set_version.outputs.TAG_NAME }}"
+            git push origin "${{ steps.set_version.outputs.TAG_NAME }}"
+          fi
+
+      - name: Initialize GitHub Release Entry
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.set_version.outputs.TAG_NAME }}
+          name: "Кулинарный Блокнот ${{ steps.set_version.outputs.TAG_NAME }}"
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## 🍳 Кулинарный Блокнот — Релиз ${{ steps.set_version.outputs.TAG_NAME }}
+            
+            ### 📦 Доступные загрузки для всех платформ:
+            * **Windows (Установщик):** `Кулинарный Блокнот-Setup-*.exe` — стандартная установка в систему с ярлыками и меню Пуск.
+            * **Windows (Портативная):** `Кулинарный Блокнот-Portable-*.exe` — запуск без установки из любой папки/флешки.
+            * **macOS:** `Кулинарный Блокнот-*-macOS.dmg` и `.zip` — для Mac (Apple Silicon & Intel).
+            * **Linux:** `Кулинарный Блокнот-*-Linux.AppImage` и `.deb` — универсальный портативный пакет и deb-пакет.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_and_publish:
+    needs: prepare_release
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Update package.json version
+        run: |
+          node -e "const pkg=require('./package.json'); pkg.version='${{ needs.prepare_release.outputs.version }}'; require('fs').writeFileSync('./package.json', JSON.stringify(pkg, null, 2));"
+
+      - name: Build Web Frontend Assets
+        run: npm run build
+
+      - name: Build Desktop Apps (Installer & Portable)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx electron-builder --publish never
+
+      - name: Upload Binary Artifacts to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare_release.outputs.tag_name }}
+          files: |
+            release/*.exe
+            release/*.dmg
+            release/*.zip
+            release/*.AppImage
+            release/*.deb
+            release/*.blockmap
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy_github_pages:
+    needs: prepare_release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web Distribution
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist

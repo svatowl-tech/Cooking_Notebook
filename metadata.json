@@ -1,0 +1,6 @@
+{
+  "name": "Кулинарный Блокнот",
+  "description": "Автономная кулинарная тетрадь для iOS. Хранение рецептов, парсер из буфера, режим Шеф-повар и таймеры.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

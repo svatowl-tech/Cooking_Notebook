@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .font-serif-title {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+  .font-handwriting {
+    font-family: 'Caveat', 'Marck Script', cursive;
+  }
+  .font-san-francisco {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+}
+
+/* Skeuomorphic Paper & Leather Textures */
+.bg-leather {
+  background-color: #3b2319;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 0),
+                    radial-gradient(rgba(0, 0, 0, 0.3) 1px, transparent 0);
+  background-size: 8px 8px, 16px 16px;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+}
+
+.bg-paper-warm {
+  background-color: #FDFBF7;
+  background-image: 
+    linear-gradient(90deg, rgba(239, 68, 68, 0.12) 1px, transparent 1px),
+    linear-gradient(rgba(229, 231, 235, 0.4) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 28px;
+  background-position: 48px 0, 0 8px;
+}
+
+.bg-paper-dots {
+  background-color: #FBF8F1;
+  background-image: radial-gradient(#d4cebe 1.2px, transparent 1.2px);
+  background-size: 20px 20px;
+}
+
+/* Notebook Spine Shadow & Page Stacking Effect */
+.notebook-page-shadow {
+  box-shadow: 
+    0 1px 3px rgba(0,0,0,0.08),
+    0 8px 24px -4px rgba(45,27,20,0.15),
+    -2px 0 8px rgba(0,0,0,0.06),
+    inset -1px 0 2px rgba(0,0,0,0.03);
+}
+
+.notebook-stack-right {
+  box-shadow: 
+    3px 3px 0 0 #f4efe4,
+    4px 4px 0 0 #d9cfb8,
+    7px 7px 0 0 #eee7d5,
+    8px 8px 0 0 #c2b69c,
+    0 12px 28px -6px rgba(0, 0, 0, 0.35);
+}
+
+/* Binder Spiral / Rings Rings Effect */
+.ring-hole {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #2a1c15;
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.4);
+}
+
+.ring-binder-metal {
+  background: linear-gradient(135deg, #e0e0e0 0%, #888888 50%, #444444 100%);
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.8);
+}
+
+/* Ribbon Bookmark Tabs */
+.ribbon-tab {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+}
+.ribbon-tab:active {
+  transform: translateY(2px) scale(0.98);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 90, 70, 0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 90, 70, 0.5);
+}
+
+/* Print CSS Styles */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+}
+
