@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "iOS-styled offline notebook for recipes",
-  "author": "Cookbook Team",
+  "author": "Cookbook Team <Svat.Owl@gmail.com>",
   "homepage": "./",
   "type": "module",
   "main": "electron/main.js",
@@ -73,6 +73,8 @@
         "deb"
       ],
       "category": "Utility",
+      "desktopName": "Кулинарный Блокнот",
+      "syncDesktopName": true,
       "artifactName": "${productName}-${version}-Linux.${ext}"
     }
   },
