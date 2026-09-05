@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BackupSnapshot } from '../types';
 import { HardDriveDownload, Download, Upload, RotateCcw, X, ShieldCheck, AlertCircle, Trash2, Database } from 'lucide-react';
 import { triggerHaptic, playClickSound } from '../utils/audioSynth';
+import { GoogleDriveSync } from './GoogleDriveSync';
 
 interface BackupModalProps {
   isOpen: boolean;
@@ -137,6 +138,8 @@ export const BackupModal: React.FC<BackupModalProps> = ({
               <span>Выгрузить всю базу рецептов в .json</span>
             </button>
           </div>
+
+          <GoogleDriveSync onExportJSON={onExportJSON} onImportJSON={onImportJSON} />
 
           {/* Section 2: Import JSON File */}
           <div className="p-4 rounded-xl bg-[#FAF6EC] border border-[#DECBB3] space-y-3">
