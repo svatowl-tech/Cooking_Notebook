@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B2319" />
+      <stop offset="50%" stop-color="#2D1B14" />
+      <stop offset="100%" stop-color="#1F110B" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F3E5AB" />
+      <stop offset="40%" stop-color="#D4AF37" />
+      <stop offset="100%" stop-color="#AA820A" />
+    </linearGradient>
+    <linearGradient id="paperGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F4EBD9" />
+      <stop offset="100%" stop-color="#FAF6EC" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.55" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded canvas -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  
+  <!-- Outer Gold Notebook Border -->
+  <rect x="24" y="24" width="464" height="464" rx="96" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-opacity="0.6" />
+
+  <!-- Inner Notebook Cover -->
+  <g filter="url(#shadow)">
+    <!-- Book Spine Stitching Effect -->
+    <rect x="80" y="80" width="352" height="352" rx="36" fill="#24150F" stroke="url(#goldGrad)" stroke-width="3" />
+    <line x1="130" y1="80" x2="130" y2="432" stroke="url(#goldGrad)" stroke-width="2" stroke-dasharray="6,6" stroke-opacity="0.5" />
+    
+    <!-- Red/Gold Ribbon Bookmark hanging out at bottom -->
+    <path d="M340 80 L340 220 L360 200 L380 220 L380 80 Z" fill="#991B1B" />
+    <path d="M340 80 L340 220 L360 200 L380 220 L380 80 Z" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" />
+  </g>
+
+  <!-- Central Chef Hat & Crossed Spoon/Fork Icon -->
+  <g transform="translate(256, 260)">
+    <!-- Glow circle behind emblem -->
+    <circle cx="0" cy="-10" r="100" fill="#D4AF37" fill-opacity="0.12" />
+    
+    <!-- Chef Hat -->
+    <path d="M-50 -10 C-75 -30 -65 -75 -35 -80 C-30 -115 30 -115 35 -80 C65 -75 75 -30 50 -10 Z" fill="url(#paperGrad)" stroke="url(#goldGrad)" stroke-width="3" />
+    <!-- Hat band -->
+    <rect x="-46" y="-12" width="92" height="22" rx="5" fill="#2D1B14" stroke="url(#goldGrad)" stroke-width="2" />
+    
+    <!-- Crossed Cutlery: Spoon and Fork -->
+    <!-- Fork -->
+    <g transform="rotate(-35) translate(-10, 45)">
+      <line x1="0" y1="-25" x2="0" y2="45" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round" />
+      <path d="M-8 -25 L-8 -45 M-3 -25 L-3 -47 M3 -25 L3 -47 M8 -25 L8 -45" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round" />
+      <path d="M-8 -25 C-8 -15 8 -15 8 -25 Z" fill="url(#goldGrad)" />
+    </g>
+    <!-- Spoon -->
+    <g transform="rotate(35) translate(10, 45)">
+      <line x1="0" y1="-25" x2="0" y2="45" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round" />
+      <ellipse cx="0" cy="-35" rx="10" ry="15" fill="url(#goldGrad)" />
+    </g>
+
+    <!-- Star Emblem Center -->
+    <polygon points="0,25 3,33 11,33 5,38 7,46 0,41 -7,46 -5,38 -11,33 -3,33" fill="#D4AF37" />
+  </g>
+
+  <!-- Small text banner at bottom -->
+  <text x="256" y="405" text-anchor="middle" fill="url(#goldGrad)" font-family="serif" font-size="18" font-weight="bold" letter-spacing="4">
+    КУЛИНАРНЫЙ БЛОКНОТ
+  </text>
+</svg>

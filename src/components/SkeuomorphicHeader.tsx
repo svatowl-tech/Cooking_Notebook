@@ -2,6 +2,7 @@ import React from 'react';
 import { CATEGORIES, CategoryType } from '../types';
 import { Search, Clipboard, Plus, HardDriveDownload, Star, BookOpen, Bot, Settings } from 'lucide-react';
 import { triggerHaptic, playClickSound } from '../utils/audioSynth';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface SkeuomorphicHeaderProps {
   selectedCategory: CategoryType;
@@ -109,6 +110,9 @@ export const SkeuomorphicHeader: React.FC<SkeuomorphicHeaderProps> = ({
             >
               <Settings className="w-4 h-4" />
             </button>
+
+            {/* PWA Install Button */}
+            <PWAInstallButton variant="header" />
 
             {/* Add Recipe Button */}
             <button

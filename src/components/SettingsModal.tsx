@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Volume2, BellRing, Music, SmartphoneNfc } from 'lucide-react';
 import { triggerHaptic, playClickSound, playTimerCompletionSound, AlarmSoundType } from '../utils/audioSynth';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -52,6 +53,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
 
         {/* Content */}
         <div className="p-5 space-y-5">
+          <PWAInstallButton variant="settings" />
+
           <div className="space-y-3">
             <h3 className="text-sm font-bold text-[#8C5828] uppercase tracking-wider flex items-center gap-1.5">
               <Volume2 className="w-4 h-4" />

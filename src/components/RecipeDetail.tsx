@@ -107,17 +107,18 @@ export const RecipeDetail: React.FC<RecipeDetailProps> = ({
             <span>Шеф-повар</span>
           </button>
 
-          {/* Poster & Web Share */}
+          {/* Export & Share Modal */}
           <button
             onClick={() => {
               playClickSound();
               triggerHaptic(30);
               onOpenPosterCard(recipe);
             }}
-            className="p-2 rounded-xl bg-[#3B261A] hover:bg-[#4E3323] text-amber-200 border border-[#6B4731] active:scale-95 transition"
-            title="Постер / Поделиться"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#3B261A] hover:bg-[#4E3323] text-amber-200 border border-[#6B4731] active:scale-95 transition text-xs font-semibold"
+            title="Экспорт рецепта и печать"
           >
-            <Share2 className="w-4 h-4" />
+            <Share2 className="w-4 h-4 text-[#D4AF37]" />
+            <span className="hidden sm:inline">Экспорт</span>
           </button>
 
           {/* Print / PDF */}
