@@ -25,7 +25,7 @@ interface RecipeDetailProps {
   onEdit: (recipe: Recipe) => void;
   onDelete: (id: string) => void;
   onToggleFavorite: (id: string) => void;
-  onStartChefMode: (recipe: Recipe) => void;
+  onStartChefMode: (recipe: Recipe, servingMultiplier: number) => void;
   onOpenPosterCard: (recipe: Recipe) => void;
   onStartStepTimer: (stepId: string, stepNumber: number, recipeTitle: string, durationSeconds: number) => void;
   activeTimers: ActiveTimer[];
@@ -99,7 +99,7 @@ export const RecipeDetail: React.FC<RecipeDetailProps> = ({
             onClick={() => {
               playClickSound();
               triggerHaptic(50);
-              onStartChefMode(recipe);
+              onStartChefMode(recipe, servingMultiplier);
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-lg border border-emerald-500/40 active:scale-95 transition"
           >
@@ -349,6 +349,31 @@ export const RecipeDetail: React.FC<RecipeDetailProps> = ({
                         {step.photoBase64 && (
                           <div className="mt-2 rounded-xl overflow-hidden border border-[#D4CEBE] max-w-sm">
                             <img src={step.photoBase64} alt={`Шаг ${step.stepNumber}`} className="w-full h-auto" />
+                          </div>
+                        )}
+
+                        {/* Step Ingredients Mini-List */}
+                        {step.ingredients && step.ingredients.length > 0 && (
+                          <div className="mt-2 p-2.5 rounded-xl bg-white/50 border border-[#DECBB3] text-xs">
+                            <span className="font-bold text-[#8C5828] uppercase tracking-wider text-[10px] block mb-1">
+                              Ингредиенты на этом шаге:
+                            </span>
+                            <ul className="space-y-1">
+                              {step.ingredients.map((ing) => {
+                                const scaledAmount = ing.unit === 'to_taste' ? 0 : Math.round(ing.amount * servingMultiplier * 10) / 10;
+                                const unitLabel = UNIT_LABELS[ing.unit] || ing.unit;
+                                return (
+                                  <li key={ing.id} className="flex justify-between items-center text-[#2C1D16] border-b border-dashed border-[#EAE4D6] pb-1 last:border-0 last:pb-0">
+                                    <span className="font-medium">{ing.name}</span>
+                                    {ing.unit === 'to_taste' ? (
+                                      <span className="text-[#8C5828] text-[10px] font-bold bg-[#E8DEC8] px-1.5 rounded">по вкусу</span>
+                                    ) : (
+                                      <span className="font-bold text-[#8C5828]">{scaledAmount} {unitLabel}</span>
+                                    )}
+                                  </li>
+                                );
+                              })}
+                            </ul>
                           </div>
                         )}
 

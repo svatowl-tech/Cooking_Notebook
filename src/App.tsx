@@ -10,6 +10,7 @@ import { ClipboardImportModal } from './components/ClipboardImportModal';
 import { ChefMode } from './components/ChefMode';
 import { RecipePosterCard } from './components/RecipePosterCard';
 import { BackupModal } from './components/BackupModal';
+import { AIPromptGeneratorModal } from './components/AIPromptGeneratorModal';
 import { ActiveTimersBar } from './components/ActiveTimersBar';
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
   // App View Navigation State
   const [currentView, setCurrentView] = useState<'list' | 'detail' | 'add' | 'edit' | 'chef'>('list');
   const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
+  const [chefModeMultiplier, setChefModeMultiplier] = useState<number>(1);
 
   // Filters State
   const [selectedCategory, setSelectedCategory] = useState<CategoryType>('Все рецепты');
@@ -47,6 +49,7 @@ export default function App() {
 
   // Modals State
   const [isClipboardModalOpen, setIsClipboardModalOpen] = useState(false);
+  const [isAIPromptModalOpen, setIsAIPromptModalOpen] = useState(false);
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
   const [posterRecipe, setPosterRecipe] = useState<Recipe | null>(null);
 
@@ -104,6 +107,7 @@ export default function App() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onOpenClipboardImport={() => setIsClipboardModalOpen(true)}
+          onOpenAIPrompt={() => setIsAIPromptModalOpen(true)}
           onOpenAddRecipe={() => {
             setSelectedRecipeId(null);
             setCurrentView('add');
@@ -149,7 +153,10 @@ export default function App() {
               setSelectedRecipeId(null);
             }}
             onToggleFavorite={(id) => toggleFavorite(id)}
-            onStartChefMode={() => setCurrentView('chef')}
+            onStartChefMode={(recipe, multiplier) => {
+              setChefModeMultiplier(multiplier);
+              setCurrentView('chef');
+            }}
             onOpenPosterCard={(rec) => setPosterRecipe(rec)}
             onStartStepTimer={startTimer}
             activeTimers={activeTimers}
@@ -173,6 +180,7 @@ export default function App() {
         {currentView === 'chef' && selectedRecipe && (
           <ChefMode
             recipe={selectedRecipe}
+            servingMultiplier={chefModeMultiplier}
             onClose={() => setCurrentView('detail')}
             activeTimers={activeTimers}
             onStartTimer={startTimer}
@@ -205,6 +213,12 @@ export default function App() {
         onImportSuccess={(parsedData) => {
           handleSaveRecipeData(parsedData);
         }}
+      />
+
+      {/* AI Prompt Generator Modal */}
+      <AIPromptGeneratorModal
+        isOpen={isAIPromptModalOpen}
+        onClose={() => setIsAIPromptModalOpen(false)}
       />
 
       {/* Poster & Print Card Generator Modal */}

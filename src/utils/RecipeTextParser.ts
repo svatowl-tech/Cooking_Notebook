@@ -224,25 +224,45 @@ export class RecipeTextParser {
   }
 
   /**
-   * Processes step lines and auto-detects cooking timers in step text
+   * Processes step lines and auto-detects cooking timers in step text,
+   * as well as nested ingredients for the step.
    */
   public static parseStepLines(rawSteps: string[]): RecipeStep[] {
     const steps: RecipeStep[] = [];
+    let currentStep: RecipeStep | null = null;
     let stepCount = 1;
 
     for (const rawLine of rawSteps) {
-      let clean = rawLine.replace(/^(шаг\s*\d+:?|\d+[\.\)]|-|•|\*)\s*/i, '').trim();
+      let clean = rawLine.trim();
+      if (!clean) continue;
+
+      // Detect if this line is an ingredient for the current step (starts with -, •, * or is indented heavily after a step)
+      if (currentStep && (clean.startsWith('-') || clean.startsWith('•') || clean.startsWith('*') || /ингредиент/i.test(clean))) {
+        // Try parsing as ingredient
+        if (!/ингредиент/i.test(clean)) {
+            const ing = RecipeTextParser.parseIngredientLine(clean, currentStep.ingredients?.length || 0);
+            if (ing) {
+                if (!currentStep.ingredients) currentStep.ingredients = [];
+                currentStep.ingredients.push(ing);
+            }
+        }
+        continue;
+      }
+
+      clean = clean.replace(/^(шаг\s*\d+:?|\d+[\.\)]|-|•|\*)\s*/i, '').trim();
       if (!clean) continue;
 
       // Detect timer regex: e.g. "варить 15 минут", "выпекать 45 мин", "тушить 1.5 часа", "10-15 минут"
       const timerDurationSeconds = RecipeTextParser.extractTimerSeconds(clean);
 
-      steps.push({
+      currentStep = {
         id: `step_${Date.now()}_${stepCount}_${Math.random().toString(36).substring(2, 6)}`,
         stepNumber: stepCount,
         instruction: clean,
         timerDurationSeconds: timerDurationSeconds > 0 ? timerDurationSeconds : undefined,
-      });
+        ingredients: []
+      };
+      steps.push(currentStep);
 
       stepCount++;
     }

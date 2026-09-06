@@ -154,13 +154,36 @@ export const RecipeEditor: React.FC<RecipeEditorProps> = ({
       return;
     }
 
-    const cleanIngredients = ingredients.filter((i) => i.name.trim().length > 0);
-    if (cleanIngredients.length === 0) {
-      setValidationError('Добавьте хотя бы один ингредиент');
+    // Merge step ingredients into global ingredients
+    let currentGlobalIngredients = [...ingredients];
+    
+    const cleanSteps = steps.map((s) => {
+      // Clean up step ingredients
+      const cleanStepIngs = s.ingredients?.filter((i) => i.name.trim().length > 0) || [];
+      
+      // Sync to global
+      cleanStepIngs.forEach(stepIng => {
+         const exists = currentGlobalIngredients.find(gIng => gIng.name.toLowerCase() === stepIng.name.toLowerCase());
+         if (!exists) {
+            currentGlobalIngredients.push({
+               ...stepIng,
+               id: `ing_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`
+            });
+         }
+      });
+
+      return {
+        ...s,
+        ingredients: cleanStepIngs.length > 0 ? cleanStepIngs : undefined
+      };
+    }).filter((s) => s.instruction.trim().length > 0);
+
+    const cleanIngredients = currentGlobalIngredients.filter((i) => i.name.trim().length > 0);
+    if (cleanIngredients.length === 0 && cleanSteps.length === 0) {
+      setValidationError('Добавьте хотя бы один ингредиент или шаг');
       return;
     }
 
-    const cleanSteps = steps.filter((s) => s.instruction.trim().length > 0);
     if (cleanSteps.length === 0) {
       setValidationError('Добавьте хотя бы один шаг приготовления');
       return;
@@ -513,8 +536,8 @@ export const RecipeEditor: React.FC<RecipeEditorProps> = ({
                   </div>
                 </div>
 
-                {/* Step Photo Upload */}
-                <div className="flex items-center gap-3">
+                {/* Step Photo Upload & Step Ingredients Button */}
+                <div className="flex flex-wrap items-center gap-3">
                   {step.photoBase64 ? (
                     <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-[#C5BBAA]">
                       <img src={step.photoBase64} alt={`Фото шага ${step.stepNumber}`} className="w-full h-full object-cover" />
@@ -539,7 +562,101 @@ export const RecipeEditor: React.FC<RecipeEditorProps> = ({
                       <input type="file" accept="image/*" onChange={(e) => handleStepPhotoUpload(idx, e)} className="hidden" />
                     </label>
                   )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                       setSteps((prev) => {
+                          const updated = [...prev];
+                          const newIng: Ingredient = {
+                             id: `step_ing_${Date.now()}_${Math.random().toString(36).substring(2,6)}`,
+                             name: '', amount: 100, unit: 'g'
+                          };
+                          updated[idx] = {
+                             ...updated[idx],
+                             ingredients: [...(updated[idx].ingredients || []), newIng]
+                          };
+                          return updated;
+                       });
+                    }}
+                    className="px-3 py-1.5 rounded-lg border border-dashed border-[#6B4B35] bg-[#EFE8D8] text-[#6B4B35] hover:bg-[#E2D8C3] text-xs font-medium flex items-center gap-1.5 transition"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Ингредиент к шагу</span>
+                  </button>
                 </div>
+
+                {/* Step Ingredients List */}
+                {step.ingredients && step.ingredients.length > 0 && (
+                   <div className="mt-2 pl-2 border-l-2 border-[#D4CEBE] space-y-2">
+                     <span className="text-[10px] font-bold text-[#8C5828] uppercase tracking-wider">Ингредиенты для этого шага:</span>
+                     {step.ingredients.map((ing, ingIdx) => (
+                        <div key={ing.id} className="flex flex-wrap items-center gap-2">
+                          <input
+                             type="text"
+                             value={ing.name}
+                             onChange={(e) => {
+                                setSteps((prev) => {
+                                   const updated = [...prev];
+                                   if (updated[idx].ingredients) {
+                                      updated[idx].ingredients[ingIdx].name = e.target.value;
+                                   }
+                                   return updated;
+                                });
+                             }}
+                             placeholder="Название"
+                             className="flex-1 min-w-[120px] bg-white text-[#2C1D16] text-xs font-bold rounded-lg px-2 py-1.5 border border-[#C5BBAA] focus:outline-none focus:border-[#8C5828]"
+                          />
+                          <input
+                             type="number"
+                             value={ing.amount}
+                             onChange={(e) => {
+                                setSteps((prev) => {
+                                   const updated = [...prev];
+                                   if (updated[idx].ingredients) {
+                                      updated[idx].ingredients[ingIdx].amount = parseFloat(e.target.value) || 0;
+                                   }
+                                   return updated;
+                                });
+                             }}
+                             className="w-16 text-center bg-white text-[#2C1D16] text-xs font-bold rounded-lg px-2 py-1.5 border border-[#C5BBAA] focus:outline-none focus:border-[#8C5828]"
+                          />
+                          <select
+                             value={ing.unit}
+                             onChange={(e) => {
+                                setSteps((prev) => {
+                                   const updated = [...prev];
+                                   if (updated[idx].ingredients) {
+                                      updated[idx].ingredients[ingIdx].unit = e.target.value as UnitType;
+                                   }
+                                   return updated;
+                                });
+                             }}
+                             className="bg-white text-[#2C1D16] text-xs font-bold rounded-lg px-2 py-1.5 border border-[#C5BBAA] focus:outline-none focus:border-[#8C5828]"
+                          >
+                            {Object.entries(UNIT_LABELS).map(([key, label]) => (
+                               <option key={key} value={key}>{label}</option>
+                            ))}
+                          </select>
+                          <button
+                             type="button"
+                             onClick={() => {
+                                setSteps((prev) => {
+                                   const updated = [...prev];
+                                   if (updated[idx].ingredients) {
+                                      updated[idx].ingredients = updated[idx].ingredients.filter(i => i.id !== ing.id);
+                                   }
+                                   return updated;
+                                });
+                             }}
+                             className="p-1.5 text-red-700 hover:text-red-900"
+                          >
+                             <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                     ))}
+                   </div>
+                )}
               </div>
             ))}
           </div>

@@ -15,6 +15,7 @@ export interface RecipeStep {
   timerDurationSeconds?: number; // Автоматически распознанное время в секундах
   photoBase64?: string;          // Фото этапа готовки
   tips?: string;                 // Пояснения/лайфхаки к шагу
+  ingredients?: Ingredient[];    // Ингредиенты для данного конкретного шага
 }
 
 export interface Recipe {

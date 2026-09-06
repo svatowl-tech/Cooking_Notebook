@@ -18,6 +18,7 @@ import { triggerHaptic, playClickSound } from '../utils/audioSynth';
 
 interface ChefModeProps {
   recipe: Recipe;
+  servingMultiplier: number;
   onClose: () => void;
   activeTimers: ActiveTimer[];
   onStartTimer: (stepId: string, stepNumber: number, recipeTitle: string, durationSeconds: number) => void;
@@ -30,6 +31,7 @@ interface ChefModeProps {
 
 export const ChefMode: React.FC<ChefModeProps> = ({
   recipe,
+  servingMultiplier,
   onClose,
   activeTimers,
   onStartTimer,
@@ -136,6 +138,30 @@ export const ChefMode: React.FC<ChefModeProps> = ({
         {currentStep.tips && (
           <div className="p-3 sm:p-4 rounded-2xl bg-amber-950/70 border border-amber-700/50 text-amber-200/90 text-sm sm:text-base max-w-xl">
             💡 <strong>Совет шефа:</strong> {currentStep.tips}
+          </div>
+        )}
+
+        {/* Step Ingredients Focus */}
+        {currentStep.ingredients && currentStep.ingredients.length > 0 && (
+          <div className="w-full max-w-md bg-amber-950/30 p-4 rounded-2xl border border-amber-900/50 shadow-inner space-y-2">
+            <span className="text-amber-500/80 font-bold text-xs uppercase tracking-widest block mb-2 text-left">
+              Ингредиенты:
+            </span>
+            <ul className="space-y-1.5 text-left">
+              {currentStep.ingredients.map(ing => {
+                const scaledAmount = ing.unit === 'to_taste' ? 0 : Math.round(ing.amount * servingMultiplier * 10) / 10;
+                return (
+                  <li key={ing.id} className="flex justify-between items-end border-b border-dashed border-amber-900/40 pb-1">
+                    <span className="text-amber-100 font-medium text-lg">{ing.name}</span>
+                    {ing.unit === 'to_taste' ? (
+                       <span className="text-amber-400 font-bold text-sm bg-amber-950 px-2 rounded">по вкусу</span>
+                    ) : (
+                       <span className="text-amber-300 font-bold text-base">{scaledAmount} {ing.unit}</span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         )}
 
