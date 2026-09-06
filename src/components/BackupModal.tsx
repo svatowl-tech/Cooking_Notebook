@@ -237,16 +237,16 @@ export const BackupModal: React.FC<BackupModalProps> = ({
             </span>
             <button
               onClick={async () => {
-                if (window.confirm('Сбросить базу и загрузить начальные рецепты?')) {
+                if (window.confirm('Сбросить базу и загрузить начальные рецепты? Все текущие рецепты будут удалены!')) {
                   triggerHaptic(50);
                   await onResetToSeed();
                   setStatusMessage('База сброшена к начальным рецептам.');
                   setIsError(false);
                 }
               }}
-              className="px-3 py-1.5 rounded-xl bg-red-950/60 hover:bg-red-900 text-red-300 border border-red-800/50 text-xs font-bold"
+              className="px-3 py-1.5 rounded-xl bg-red-950/60 hover:bg-red-900 text-red-300 border border-red-800/50 text-[11px] font-bold"
             >
-              Сброс к демо-базе
+              Сбросить к изначальным
             </button>
           </div>
         </div>

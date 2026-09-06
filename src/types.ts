@@ -6,6 +6,7 @@ export interface Ingredient {
   amount: number;
   unit: UnitType;
   substitutes?: string[]; // Возможные замены
+  isOptional?: boolean;   // Опциональный или обязательный ингредиент
 }
 
 export interface RecipeStep {

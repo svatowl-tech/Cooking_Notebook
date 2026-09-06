@@ -262,11 +262,14 @@ export const RecipeDetail: React.FC<RecipeDetailProps> = ({
                 return (
                   <div
                     key={ing.id}
-                    className="p-3 rounded-xl bg-[#F8F4EA] border border-[#E0D5C3] flex items-start justify-between gap-2 shadow-xs"
+                    className="p-3 rounded-xl bg-[#F8F4EA] border border-[#E0D5C3] flex items-start justify-between gap-2 shadow-xs relative"
                   >
                     <div>
-                      <span className="font-medium text-sm text-[#2C1D16] block">
+                      <span className="font-medium text-sm text-[#2C1D16] block flex items-center gap-2">
                         {ing.name}
+                        {ing.isOptional && (
+                          <span className="text-[9px] uppercase tracking-wide font-bold bg-[#DECBB3] text-[#6B4B35] px-1.5 py-0.5 rounded-sm">По желанию</span>
+                        )}
                       </span>
                       {ing.substitutes && ing.substitutes.length > 0 && (
                         <span className="text-[11px] text-[#A66E38] italic block font-san-francisco">
@@ -364,7 +367,12 @@ export const RecipeDetail: React.FC<RecipeDetailProps> = ({
                                 const unitLabel = UNIT_LABELS[ing.unit] || ing.unit;
                                 return (
                                   <li key={ing.id} className="flex justify-between items-center text-[#2C1D16] border-b border-dashed border-[#EAE4D6] pb-1 last:border-0 last:pb-0">
-                                    <span className="font-medium">{ing.name}</span>
+                                    <span className="font-medium flex items-center gap-2">
+                                      {ing.name}
+                                      {ing.isOptional && (
+                                        <span className="text-[9px] uppercase tracking-wide font-bold bg-[#DECBB3] text-[#6B4B35] px-1.5 py-0.5 rounded-sm">По желанию</span>
+                                      )}
+                                    </span>
                                     {ing.unit === 'to_taste' ? (
                                       <span className="text-[#8C5828] text-[10px] font-bold bg-[#E8DEC8] px-1.5 rounded">по вкусу</span>
                                     ) : (

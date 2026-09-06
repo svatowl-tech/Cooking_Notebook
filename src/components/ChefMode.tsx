@@ -152,7 +152,12 @@ export const ChefMode: React.FC<ChefModeProps> = ({
                 const scaledAmount = ing.unit === 'to_taste' ? 0 : Math.round(ing.amount * servingMultiplier * 10) / 10;
                 return (
                   <li key={ing.id} className="flex justify-between items-end border-b border-dashed border-amber-900/40 pb-1">
-                    <span className="text-amber-100 font-medium text-lg">{ing.name}</span>
+                    <span className="text-amber-100 font-medium text-lg flex items-center gap-2">
+                      {ing.name}
+                      {ing.isOptional && (
+                        <span className="text-[10px] uppercase tracking-wide font-bold bg-amber-900/60 text-amber-300 px-1.5 py-0.5 rounded-sm">Опционально</span>
+                      )}
+                    </span>
                     {ing.unit === 'to_taste' ? (
                        <span className="text-amber-400 font-bold text-sm bg-amber-950 px-2 rounded">по вкусу</span>
                     ) : (

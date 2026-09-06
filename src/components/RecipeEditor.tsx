@@ -433,6 +433,22 @@ export const RecipeEditor: React.FC<RecipeEditorProps> = ({
                     ))}
                   </select>
 
+                  {/* Optional Toggle */}
+                  <label className="flex items-center gap-1.5 text-xs text-[#6B4B35] cursor-pointer bg-[#FAF6EC] px-2 py-1.5 rounded-lg border border-[#C5BBAA]">
+                    <input
+                      type="checkbox"
+                      checked={ing.isOptional || false}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setIngredients((prev) =>
+                          prev.map((i) => (i.id === ing.id ? { ...i, isOptional: checked } : i))
+                        );
+                      }}
+                      className="accent-[#8C5828]"
+                    />
+                    <span>По желанию</span>
+                  </label>
+
                   <button
                     type="button"
                     onClick={() => removeIngredient(ing.id)}
@@ -638,6 +654,27 @@ export const RecipeEditor: React.FC<RecipeEditorProps> = ({
                                <option key={key} value={key}>{label}</option>
                             ))}
                           </select>
+
+                          {/* Optional Toggle */}
+                          <label className="flex items-center gap-1.5 text-xs text-[#6B4B35] cursor-pointer bg-white px-2 py-1.5 rounded-lg border border-[#C5BBAA]">
+                            <input
+                              type="checkbox"
+                              checked={ing.isOptional || false}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setSteps((prev) => {
+                                   const updated = [...prev];
+                                   if (updated[idx].ingredients) {
+                                      updated[idx].ingredients[ingIdx].isOptional = checked;
+                                   }
+                                   return updated;
+                                });
+                              }}
+                              className="accent-[#8C5828]"
+                            />
+                            <span>По желанию</span>
+                          </label>
+
                           <button
                              type="button"
                              onClick={() => {

@@ -7,11 +7,9 @@ interface GoogleDriveSyncProps {
   onImportJSON: (jsonText: string, mode: 'merge' | 'overwrite') => Promise<{ success: boolean; importedCount: number; message: string }>;
 }
 
-export const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({ onExportJSON, onImportJSON }) => {
+const GoogleDriveSyncInner: React.FC<GoogleDriveSyncProps> = ({ onExportJSON, onImportJSON }) => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
-
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
   const syncToDrive = async (accessToken: string) => {
     setIsSyncing(true);
@@ -66,24 +64,6 @@ export const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({ onExportJSON, 
     onError: (error) => setSyncStatus({ type: 'error', msg: 'Ошибка авторизации Google.' })
   });
 
-  if (!googleClientId) {
-    return (
-      <div className="p-4 rounded-xl bg-[#FAF6EC] border border-[#DECBB3] space-y-3">
-        <div className="flex items-center gap-2">
-          <Cloud className="w-5 h-5 text-gray-500" />
-          <div>
-            <h4 className="font-bold text-sm text-[#2C1D16]">
-              Синхронизация Google Drive
-            </h4>
-            <p className="text-[11px] text-gray-500 font-san-francisco leading-snug mt-1">
-              Для включения этой функции необходимо настроить OAuth Client ID в Google Cloud Console и прописать его в файл <code>.env.example</code> (VITE_GOOGLE_CLIENT_ID).
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="p-4 rounded-xl bg-[#FAF6EC] border border-[#DECBB3] space-y-3">
       <div className="flex items-center gap-2">
@@ -115,4 +95,28 @@ export const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({ onExportJSON, 
       )}
     </div>
   );
+};
+
+export const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = (props) => {
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
+  if (!googleClientId) {
+    return (
+      <div className="p-4 rounded-xl bg-[#FAF6EC] border border-[#DECBB3] space-y-3">
+        <div className="flex items-center gap-2">
+          <Cloud className="w-5 h-5 text-gray-500" />
+          <div>
+            <h4 className="font-bold text-sm text-[#2C1D16]">
+              Синхронизация Google Drive
+            </h4>
+            <p className="text-[11px] text-gray-500 font-san-francisco leading-snug mt-1">
+              Для включения этой функции необходимо настроить OAuth Client ID в Google Cloud Console и прописать его в файл <code>.env.example</code> (VITE_GOOGLE_CLIENT_ID).
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <GoogleDriveSyncInner {...props} />;
 };

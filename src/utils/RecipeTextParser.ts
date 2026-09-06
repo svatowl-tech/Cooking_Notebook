@@ -151,6 +151,14 @@ export class RecipeTextParser {
     let clean = line.replace(/^[•*–—\s\d+\.\)]+/, '').trim();
     if (!clean || clean.length < 2) return null;
 
+    // Check for optional flag
+    let isOptional = false;
+    const optionalRegex = /\((?:опционально|по\s+желанию)\)|опционально|по\s+желанию/i;
+    if (optionalRegex.test(clean)) {
+      isOptional = true;
+      clean = clean.replace(optionalRegex, '').trim();
+    }
+
     // Check for substitutes (e.g. "или 100г сметаны", "(можно заменить на рикотту)", "/ йогурт")
     let substitutes: string[] = [];
     const substituteRegex = /(?:или|можно\s+заменить\s+на|взамен|либо|\/)\s*([^,;\)\(\n]+)/i;
@@ -220,6 +228,7 @@ export class RecipeTextParser {
       amount: isNaN(amount) ? 1 : amount,
       unit,
       substitutes: substitutes.length > 0 ? substitutes : undefined,
+      isOptional: isOptional ? true : undefined,
     };
   }
 

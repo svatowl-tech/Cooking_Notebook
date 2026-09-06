@@ -157,6 +157,8 @@ export function useRecipeDB() {
     await db.recipes.clear();
     await db.recipes.bulkAdd(SEED_RECIPES);
     await db.createAutoBackupSnapshot();
+    // Force a page reload to ensure all state (timers, current view, etc) is completely reset along with the data
+    window.location.reload();
   }, []);
 
   return {
