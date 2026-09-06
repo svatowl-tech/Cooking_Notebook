@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { playTimerCompletionSound, triggerHaptic } from '../utils/audioSynth';
+import { playTimerCompletionSound, triggerHaptic, startBackgroundAudioSession, stopBackgroundAudioSession, AlarmSoundType } from '../utils/audioSynth';
 
 export interface ActiveTimer {
   id: string; // unique timer instance id
@@ -34,8 +34,12 @@ export function useCookTimer() {
           }
 
           if (remainingSec === 0 && timer.remainingSeconds > 0) {
+            // Read settings on-the-fly to get the most up-to-date alarm sound
+            const soundType = (localStorage.getItem('notebook_alarm_sound') as AlarmSoundType) || 'chime';
+            
             // Sound the alert chime when timer completes!
-            playTimerCompletionSound();
+            playTimerCompletionSound(soundType);
+            
             return {
               ...timer,
               remainingSeconds: 0,
@@ -49,6 +53,12 @@ export function useCookTimer() {
             remainingSeconds: remainingSec,
           };
         });
+        
+        // If there are no more active timers, we can stop the background keep-alive
+        const anyStillRunning = updated.some(t => t.isRunning);
+        if (!anyStillRunning && prevTimers.some(t => t.isRunning)) {
+           stopBackgroundAudioSession();
+        }
 
         return hasChanges ? updated : prevTimers;
       });
@@ -61,6 +71,10 @@ export function useCookTimer() {
 
   const startTimer = useCallback((stepId: string, stepNumber: number, recipeTitle: string, durationSeconds: number) => {
     triggerHaptic(40);
+    
+    // Start silent audio to keep JS execution alive even when locked
+    startBackgroundAudioSession();
+    
     setActiveTimers((prev) => {
       const existingIdx = prev.findIndex((t) => t.stepId === stepId);
       const now = Date.now();
@@ -88,8 +102,8 @@ export function useCookTimer() {
 
   const pauseTimer = useCallback((stepId: string) => {
     triggerHaptic(30);
-    setActiveTimers((prev) =>
-      prev.map((t) => {
+    setActiveTimers((prev) => {
+      const updated = prev.map((t) => {
         if (t.stepId === stepId && t.isRunning) {
           return {
             ...t,
@@ -98,12 +112,17 @@ export function useCookTimer() {
           };
         }
         return t;
-      })
-    );
+      });
+      if (!updated.some(t => t.isRunning)) {
+         stopBackgroundAudioSession();
+      }
+      return updated;
+    });
   }, []);
 
   const resumeTimer = useCallback((stepId: string) => {
     triggerHaptic(30);
+    startBackgroundAudioSession();
     setActiveTimers((prev) =>
       prev.map((t) => {
         if (t.stepId === stepId && !t.isRunning && t.remainingSeconds > 0) {
@@ -120,7 +139,8 @@ export function useCookTimer() {
   }, []);
 
   const resetTimer = useCallback((stepId: string) => {
-    triggerHaptic(30);
+    triggerHaptic(40);
+    startBackgroundAudioSession();
     setActiveTimers((prev) =>
       prev.map((t) => {
         if (t.stepId === stepId) {
@@ -139,7 +159,13 @@ export function useCookTimer() {
 
   const stopTimer = useCallback((stepId: string) => {
     triggerHaptic(30);
-    setActiveTimers((prev) => prev.filter((t) => t.stepId !== stepId));
+    setActiveTimers((prev) => {
+      const updated = prev.filter((t) => t.stepId !== stepId);
+      if (!updated.some(t => t.isRunning)) {
+         stopBackgroundAudioSession();
+      }
+      return updated;
+    });
   }, []);
 
   const addExtraMinute = useCallback((stepId: string) => {

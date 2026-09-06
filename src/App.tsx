@@ -11,6 +11,7 @@ import { ChefMode } from './components/ChefMode';
 import { RecipePosterCard } from './components/RecipePosterCard';
 import { BackupModal } from './components/BackupModal';
 import { AIPromptGeneratorModal } from './components/AIPromptGeneratorModal';
+import { SettingsModal } from './components/SettingsModal';
 import { ActiveTimersBar } from './components/ActiveTimersBar';
 
 export default function App() {
@@ -51,6 +52,7 @@ export default function App() {
   const [isClipboardModalOpen, setIsClipboardModalOpen] = useState(false);
   const [isAIPromptModalOpen, setIsAIPromptModalOpen] = useState(false);
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [posterRecipe, setPosterRecipe] = useState<Recipe | null>(null);
 
   // Active selected recipe derivation
@@ -113,6 +115,7 @@ export default function App() {
             setCurrentView('add');
           }}
           onOpenBackupModal={() => setIsBackupModalOpen(true)}
+          onOpenSettings={() => setIsSettingsModalOpen(true)}
           totalRecipesCount={recipes.length}
         />
       )}
@@ -239,6 +242,11 @@ export default function App() {
         onRestoreBackup={restoreFromBackupSnapshot}
         onResetToSeed={resetToSeedData}
       />
+
+      {/* Settings Modal */}
+      {isSettingsModalOpen && (
+        <SettingsModal onClose={() => setIsSettingsModalOpen(false)} />
+      )}
     </div>
   );
 }

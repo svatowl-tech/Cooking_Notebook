@@ -1,6 +1,6 @@
 import React from 'react';
 import { CATEGORIES, CategoryType } from '../types';
-import { Search, Clipboard, Plus, HardDriveDownload, Star, BookOpen, Bot } from 'lucide-react';
+import { Search, Clipboard, Plus, HardDriveDownload, Star, BookOpen, Bot, Settings } from 'lucide-react';
 import { triggerHaptic, playClickSound } from '../utils/audioSynth';
 
 interface SkeuomorphicHeaderProps {
@@ -12,6 +12,7 @@ interface SkeuomorphicHeaderProps {
   onOpenAIPrompt: () => void;
   onOpenAddRecipe: () => void;
   onOpenBackupModal: () => void;
+  onOpenSettings: () => void;
   totalRecipesCount: number;
 }
 
@@ -24,6 +25,7 @@ export const SkeuomorphicHeader: React.FC<SkeuomorphicHeaderProps> = ({
   onOpenAIPrompt,
   onOpenAddRecipe,
   onOpenBackupModal,
+  onOpenSettings,
   totalRecipesCount,
 }) => {
   return (
@@ -93,6 +95,19 @@ export const SkeuomorphicHeader: React.FC<SkeuomorphicHeaderProps> = ({
               title="Бэкап / Экспорт JSON"
             >
               <HardDriveDownload className="w-4 h-4" />
+            </button>
+
+            {/* Settings Button */}
+            <button
+              onClick={() => {
+                playClickSound();
+                triggerHaptic(30);
+                onOpenSettings();
+              }}
+              className="p-1.5 rounded-lg bg-[#4A3226] hover:bg-[#5C3E30] text-[#E6C875] border border-[#8C6239]/50 shadow-sm active:scale-95 transition"
+              title="Настройки"
+            >
+              <Settings className="w-4 h-4" />
             </button>
 
             {/* Add Recipe Button */}
